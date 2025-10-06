@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Diagram Viewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f0fa',
+                            100: '#e1e1f5',
+                            200: '#c4c3ee',
+                            300: '#a7a5e7',
+                            400: '#8a87e0',
+                            500: '#5D5CDE',
+                            600: '#4a4ab8',
+                            700: '#383891',
+                            800: '#25256a',
+                            900: '#121243',
+                        },
+                        modern: {
+                          background: '#f8fafc',
+                          surface: '#ffffff',
+                          text: '#334155',
+                          'text-secondary': '#64748b',
+                          border: '#e2e8f0',
+                          accent: '#6366f1'
+                        },
+                        dark: {
+                          background: '#0f172a',
+                          surface: '#1e293b',
+                          text: '#f1f5f9',
+                          'text-secondary': '#94a3b8',
+                          border: '#334155',
+                          accent: '#818cf8'
+                        }
+                    },
+                    borderRadius: {
+                      'xl': '1rem',
+                      '2xl': '1.5rem',
+                      '3xl': '2rem',
+                    },
+                    boxShadow: {
+                      'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+                      'modern': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                      'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    },
+                    backdropBlur: {
+                      'xs': '2px',
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <script src="https://unpkg.com/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-modern-background dark:bg-dark-background min-h-screen">
+    <div class="container mx-auto p-4 max-w-7xl">
+        <!-- Header -->
+        <header class="mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-modern-text dark:text-dark-text">
+                        Mermaid Diagram Viewer
+                    </h1>
+                    <p class="text-modern-text-secondary dark:text-dark-text-secondary text-sm mt-1">
+                        Mermaid 코드를 입력하여 다이어그램을 실시간으로 확인하세요
+                    </p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <!-- Dark/Light mode toggle -->
+                    <button id="themeToggle" class="p-2 rounded-lg bg-modern-surface dark:bg-dark-surface border border-modern-border dark:border-dark-border hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <svg id="themeIcon" class="w-5 h-5 text-modern-text dark:text-dark-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="space-y-6">
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Input Section -->
+                <div class="flex flex-col bg-modern-surface dark:bg-dark-surface rounded-2xl p-5 border border-modern-border dark:border-dark-border shadow-card">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                        <h2 class="text-lg font-semibold text-modern-text dark:text-dark-text">
+                            Mermaid Code
+                        </h2>
+                        <div class="flex gap-2">
+                            <button id="renderBtn" class="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors text-sm font-medium shadow-modern">
+                                Render
+                            </button>
+                            <button id="clearBtn" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors text-sm font-medium shadow-modern">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    <textarea 
+                        id="mermaidInput" 
+                        class="flex-1 w-full p-4 border border-modern-border dark:border-dark-border rounded-lg bg-white dark:bg-dark-surface text-modern-text dark:text-dark-text font-mono text-base resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent shadow-inner"
+                        placeholder="Mermaid 코드를 입력하세요..."
+                        spellcheck="false"
+                    ></textarea>
+                    <div class="mt-2 text-sm text-modern-text-secondary dark:text-dark-text-secondary">
+                        실시간 업데이트 또는 Render 버튼을 클릭하여 다이어그램을 생성합니다
+                    </div>
+                </div>
+
+                <!-- Output Section -->
+                <div class="flex flex-col bg-modern-surface dark:bg-dark-surface rounded-2xl p-5 border border-modern-border dark:border-dark-border shadow-card">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                        <h2 class="text-lg font-semibold text-modern-text dark:text-dark-text">
+                            Diagram Preview
+                        </h2>
+                        <label class="flex items-center gap-2 text-sm text-modern-text-secondary dark:text-dark-text-secondary">
+                            <input type="checkbox" id="autoRender" checked class="rounded border-modern-border dark:border-dark-border text-primary-500 focus:ring-primary-500">
+                            Auto Render
+                        </label>
+                    </div>
+                    <div class="flex-1 border border-modern-border dark:border-dark-border rounded-lg bg-white dark:bg-dark-surface p-4 overflow-auto min-h-[300px]">
+                        <div id="mermaidOutput" class="w-full h-full flex items-center justify-center">
+                            <div class="text-modern-text-secondary dark:text-dark-text-secondary text-center">
+                                다이어그램이 여기에 표시됩니다...
+                            </div>
+                        </div>
+                    </div>
+                    <div id="errorMessage" class="mt-2 text-sm text-red-500 hidden"></div>
+                </div>
+            </div>
+
+            <!-- Examples Section -->
+            <section class="bg-modern-surface dark:bg-dark-surface rounded-2xl p-5 border border-modern-border dark:border-dark-border shadow-card">
+                <h3 class="text-lg font-semibold text-modern-text dark:text-dark-text mb-4">
+                    Quick Examples
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    <button class="example-btn p-4 text-left border border-modern-border dark:border-dark-border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-modern">
+                        <div class="font-medium text-modern-text dark:text-dark-text text-sm">Flowchart</div>
+                        <div class="text-xs text-modern-text-secondary dark:text-dark-text-secondary mt-1">기본 플로우차트</div>
+                    </button>
+                    <button class="example-btn p-4 text-left border border-modern-border dark:border-dark-border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-modern">
+                        <div class="font-medium text-modern-text dark:text-dark-text text-sm">Sequence</div>
+                        <div class="text-xs text-modern-text-secondary dark:text-dark-text-secondary mt-1">시퀀스 다이어그램</div>
+                    </button>
+                    <button class="example-btn p-4 text-left border border-modern-border dark:border-dark-border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-modern">
+                        <div class="font-medium text-modern-text dark:text-dark-text text-sm">Gantt</div>
+                        <div class="text-xs text-modern-text-secondary dark:text-dark-text-secondary mt-1">간트 차트</div>
+                        </button>
+                    <button class="example-btn p-4 text-left border border-modern-border dark:border-dark-border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-modern">
+                        <div class="font-medium text-modern-text dark:text-dark-text text-sm">Class</div>
+                        <div class="text-xs text-modern-text-secondary dark:text-dark-text-secondary mt-1">클래스 다이어그램</div>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
